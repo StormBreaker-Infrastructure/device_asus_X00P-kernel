@@ -1,4 +1,4 @@
-name: Compile Android Kernel
+name: Compile X00P V3.18 Kernel
 on:
   [push, pull_request]
 
