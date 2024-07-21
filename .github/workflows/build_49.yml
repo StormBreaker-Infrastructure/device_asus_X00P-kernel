@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.SECRET_TOKEN }}
 
       - name: Update the system
         run: |
@@ -55,6 +57,24 @@ jobs:
           echo $PATH
           cd $HOME/X00P
           sw b X00P-4.9
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "Saalim Quadri"
+          git config --global user.email danascape@gmail.com
+
+      - name: Upload Dist
+        env:
+          GH_TOKEN: ${{ secrets.SECRET_TOKEN }}
+        run: |
+          export COMMIT_ID=$(git ls-remote https://github.com/danascape/linux-asus-X00P-4.9 | head -1 | cut -f -1)
+          git clone https://github.com/StormBreaker-Releases/device_asus_X00P-4.9-kernel $HOME/X00P-release
+          cd $HOME/X00P-release
+          cp -r /home/runner/X00P/out/dist/Image* ./
+          cp -r /home/runner/X00P/out/dist/modules/* ./
+          git add --all
+          git commit -m "[CI]: Update artifacts from ${COMMIT_ID}"
+          git push https://github.com/StormBreaker-Releases/device_asus_X00P-4.9-kernel main
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
