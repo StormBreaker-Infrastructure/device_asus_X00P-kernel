@@ -55,3 +55,9 @@ jobs:
           echo $PATH
           cd $HOME/X00P
           sw b X00P-3.18
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-image
+          path: /home/runner/X00P/out/arch/arm64/boot/Image.gz-dtb
