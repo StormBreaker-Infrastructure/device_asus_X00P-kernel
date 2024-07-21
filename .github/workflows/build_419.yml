@@ -52,6 +52,7 @@ jobs:
       - name: Compile Kernel
         run: |
           export PATH="$HOME/tc/clang-11/bin:$HOME/tc/gcc64/bin:$HOME/tc/gcc_32/bin:${PATH}"
+          export LD_LIBRARY_PATH="$HOME/tc/clang-11/lib64"
           echo $PATH
           cd $HOME/X00P
           sw b X00P-4.19
@@ -60,4 +61,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: kernel-image
-          path: /home/runner/X00P/out/arch/arm64/boot/Image.gz-dtb
+          path: /home/runner/X00P/out/arch/arm64/boot/Image.gz
