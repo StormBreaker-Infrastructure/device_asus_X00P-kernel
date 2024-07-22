@@ -1,0 +1,83 @@
+name: Compile X01AD V4.9 Kernel
+on:
+  [push, pull_request]
+
+jobs:
+  compile-kernel:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.SECRET_TOKEN }}
+
+      - name: Update the system
+        run: |
+          sudo apt update -y
+
+      - name: Upgrade the system
+        run: |
+          sudo apt upgrade -y
+
+      - name: Install dependencies
+        run: |
+          sudo apt -y install bc build-essential zip curl libstdc++6 git wget python3 gcc clang libssl-dev rsync flex bison device-tree-compiler sudo
+
+      - name: Install additional dependencies
+        run: |
+          curl https://raw.githubusercontent.com/akhilnarang/scripts/master/setup/android_build_env.sh | sh
+
+      - name: Install sworkflow
+        run: |
+          git clone https://github.com/danascape/sworkflow $HOME/sworkflow
+          cd $HOME/sworkflow
+          ./setup.sh i
+
+      - name: Check sworkflow
+        run: |
+          which sw
+
+      - name: Sync kernel and TC
+        run: |
+          mkdir $HOME/tc
+          export TC_DIR="$HOME/tc"
+          export WORK_DIR="$HOME"
+          git clone --depth 1 -b master https://github.com/stormbreaker-project/linux-asus-x01ad $HOME/X01AD
+          git clone --depth=1 https://github.com/stormbreaker-project/aarch64-linux-android-4.9 "$TC_DIR"/gcc64
+          git clone --depth=1 https://github.com/stormbreaker-project/arm-linux-androideabi-4.9 "$TC_DIR"/gcc_32
+          git clone --depth=1 -b aosp-11.0.5 https://github.com/sohamxda7/llvm-stable "$TC_DIR"/clang-11
+
+      - name: Compile Kernel
+        run: |
+          export PATH="$HOME/tc/clang-11/bin:$HOME/tc/gcc64/bin:$HOME/tc/gcc_32/bin:${PATH}"
+          echo $PATH
+          cd $HOME/X01AD
+          sw b X01AD
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "Saalim Quadri"
+          git config --global user.email danascape@gmail.com
+
+      - name: Upload Dist
+        env:
+          GH_TOKEN: ${{ secrets.SECRET_TOKEN }}
+        run: |
+          export COMMIT_ID=$(git ls-remote https://github.com/stormbreaker-project/linux-asus-x01ad | head -1 | cut -f -1)
+          git clone https://github.com/StormBreaker-Releases/device_asus_X01AD-kernel $HOME/X01AD-release
+          cd $HOME/X01AD-release
+          cp -r /home/runner/X01AD/out/dist/Image* ./
+          cp -r /home/runner/X01AD/out/dist/modules/* ./
+          git add --all
+          git commit -m "[CI]: Update artifacts from ${COMMIT_ID}"
+          git push https://x-access-token:${GH_TOKEN}@github.com/StormBreaker-Releases/device_asus_X01AD-kernel main
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-image
+          path: /home/runner/X01AD/out/arch/arm64/boot/Image.gz-dtb
