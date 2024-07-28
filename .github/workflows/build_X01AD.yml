@@ -49,7 +49,7 @@ jobs:
           git clone --depth 1 -b master https://github.com/stormbreaker-project/linux-asus-x01ad $HOME/X01AD
           git clone --depth=1 https://github.com/stormbreaker-project/aarch64-linux-android-4.9 "$TC_DIR"/gcc64
           git clone --depth=1 https://github.com/stormbreaker-project/arm-linux-androideabi-4.9 "$TC_DIR"/gcc_32
-          git clone --depth=1 -b aosp-11.0.5 https://github.com/sohamxda7/llvm-stable "$TC_DIR"/clang-11
+          git clone --depth=1 -b 11.x https://gitlab.com/stormbreaker-project/google-clang "$TC_DIR"/clang-11
 
       - name: Compile Kernel
         run: |
