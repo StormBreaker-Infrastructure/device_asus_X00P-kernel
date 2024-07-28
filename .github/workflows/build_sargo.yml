@@ -50,10 +50,11 @@ jobs:
           git clone --depth=1 https://github.com/stormbreaker-project/aarch64-linux-android-4.9 "$TC_DIR"/gcc64
           git clone --depth=1 https://github.com/stormbreaker-project/arm-linux-androideabi-4.9 "$TC_DIR"/gcc_32
           git clone --depth=1 -b 12.x https://gitlab.com/stormbreaker-project/google-clang "$TC_DIR"/clang-12
+          git clone --depth=1 -b main https://android.googlesource.com/platform/prebuilts/misc "$TC_DIR"/prebuilts-misc
 
       - name: Compile Kernel
         run: |
-          export PATH="$HOME/tc/clang-12/bin:$HOME/tc/gcc64/bin:$HOME/tc/gcc_32/bin:${PATH}"
+          export PATH="$HOME/tc/clang-12/bin:$HOME/tc/gcc64/bin:$HOME/tc/gcc_32/bin:$HOME/tc/prebuilts-misc/linux-x86/libufdt:${PATH}"
           export LD_LIBRARY_PATH="$HOME/tc/clang-12/lib64"
           echo $PATH
           cd $HOME/sargo
