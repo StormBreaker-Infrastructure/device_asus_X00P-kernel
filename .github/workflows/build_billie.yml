@@ -1,6 +1,11 @@
 name: Compile billie V4.19 Kernel
+
 on:
-  [push, pull_request]
+   pull_request:
+   push:
+     branches:
+       - action
+   workflow_dispatch:
 
 jobs:
   compile-kernel:

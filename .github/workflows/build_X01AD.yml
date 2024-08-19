@@ -1,6 +1,11 @@
 name: Compile X01AD V4.9 Kernel
+
 on:
-  [push, pull_request]
+   pull_request:
+   push:
+     branches:
+       - action
+   workflow_dispatch:
 
 jobs:
   compile-kernel:
